@@ -56,10 +56,17 @@ private:
     std_msgs::msg::Int32MultiArray message;
     message.data.clear();
 
-    for (int i = 0; i < num_distr_(rd_); i++)
+    std::set<int> ids_set;
+
+    int size = num_distr_(rd_);
+
+    while (ids_set.size() != size)
     {
-      message.data.push_back(id_distr_(rd_));
+      ids_set.insert(id_distr_(rd_));
     }
+    std::vector<int> ids_vec(ids_set.begin(), ids_set.end());
+
+    message.data = ids_vec;
 
     // RCLCPP_INFO(this->get_logger(), "Publishing: %s", std::to_string(message.data[0]).c_str());
     RCLCPP_INFO(this->get_logger(), "Publishing: %s", std::to_string(message.data.size()).c_str());
