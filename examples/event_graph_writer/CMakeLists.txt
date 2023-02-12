@@ -9,7 +9,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 
-# ## MemGraph mgclient clone library https://github.com/memgraph/mgclient ###
+# ## Memgraph mgclient clone library https://github.com/memgraph/mgclient ###
 include(ExternalProject)
 find_package(Boost REQUIRED COMPONENTS system filesystem thread)
 find_package(OpenSSL REQUIRED)
@@ -46,13 +46,13 @@ endif()
 
 add_dependencies(${MGCLIENT_LIBRARY} mgclient-proj)
 
-# ## MemGraph clone end ###
+# ## Memgraph clone end ###
 
 # Executable
 add_executable(event_graph_writer src/event_graph_writer.cpp)
 ament_target_dependencies(event_graph_writer rclcpp)
 
-# ## MemGraph add_dependencies ###
+# ## Memgraph add_dependencies ###
 add_dependencies(event_graph_writer ${MGCLIENT_LIBRARY})
 target_link_libraries(event_graph_writer
   ${catkin_LIBRARIES}
@@ -61,7 +61,7 @@ target_link_libraries(event_graph_writer
 
 target_include_directories(event_graph_writer PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  ${PROJECT_NAME} PRIVATE ${MGCLIENT_INCLUDE_DIRS}) # ## MemGraph libraries path ###
+  ${PROJECT_NAME} PRIVATE ${MGCLIENT_INCLUDE_DIRS}) # ## Memgraph libraries path ###
 target_compile_features(event_graph_writer PUBLIC c_std_99 cxx_std_17) # Require C99 and C++17
 
 install(TARGETS event_graph_writer

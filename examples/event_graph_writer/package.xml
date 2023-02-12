@@ -3,7 +3,7 @@
 <package format="3">
   <name>ros_memgraph_examples_event_graph_writer</name>
   <version>0.0.1</version>
-  <description> Basic listener and database writer for ROS2 graph database expamples </description>
+  <description> Basic listener and database writer for ROS 2 graph database expamples </description>
   <maintainer email="sales@graph-power.com">Graph Power</maintainer>
 
   <license>Apache 2.0</license>

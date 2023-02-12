@@ -3,7 +3,7 @@
 <package format="3">
   <name>ros_memgraph_min_example</name>
   <version>0.1.0</version>
-  <description>Mininal example of ROS and MemGraph interaction</description>
+  <description>Mininal example of ROS 2 and Memgraph interaction</description>
   <maintainer email="sales@graph-power.com">Graph Power</maintainer>
 
   <license>Apache 2.0</license>
