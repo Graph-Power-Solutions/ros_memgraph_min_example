@@ -12,8 +12,8 @@ CREATE (e1) -[:I_SEE]-> (p2)
 
 CREATE (e2:Event {timestamp: 2})
 MERGE (p1:Object {id: 1})
-CREATE (e1) -[:I_SEE]-> (p1)
-MERGE (e1:Event {timestamp: 1})
+CREATE (e2) -[:I_SEE]-> (p1)
+MATCH (e1:Event {timestamp: 1})
 CREATE (e1) -[:NEXT_EVENT]-> (e2)
 ```
 
