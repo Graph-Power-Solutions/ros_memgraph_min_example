@@ -8,6 +8,7 @@ endif()
 # Find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
 
 # ## Memgraph mgclient clone library https://github.com/memgraph/mgclient ###
 include(ExternalProject)
@@ -50,7 +51,7 @@ add_dependencies(${MGCLIENT_LIBRARY} mgclient-proj)
 
 # Executable
 add_executable(event_graph_writer src/event_graph_writer.cpp)
-ament_target_dependencies(event_graph_writer rclcpp)
+ament_target_dependencies(event_graph_writer rclcpp std_msgs)
 
 # ## Memgraph add_dependencies ###
 add_dependencies(event_graph_writer ${MGCLIENT_LIBRARY})
