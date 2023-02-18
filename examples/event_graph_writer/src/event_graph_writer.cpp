@@ -54,20 +54,45 @@ public:
     RCLCPP_INFO(this->get_logger(), "Connection terminated.");
   }
 
+  void drop_db()
+  {
+    if (!db_client_->Execute("MATCH (n) DETACH DELETE n"))
+    {
+      std::cerr << "Failed to drop db.";
+    }
+    else
+    {
+      RCLCPP_INFO(this->get_logger(), "Drop db done.");
+    }
+    db_client_->FetchOne();
+  }
+
 private:
   void topic_callback(const std_msgs::msg::Int32MultiArray &message) const
   {
     RCLCPP_INFO(this->get_logger(), "Got: '%s'", std::to_string(message.data.size()).c_str());
     rclcpp::Time t = this->now();
 
-    std::string query = "CREATE (e:Event {timestamp: " + std::to_string(t.seconds()) + " }) \n";
-    for (int i = 0; i < message.data.size(); i++)
-    {
-      query += "MERGE (p" + std::to_string(i) + ":Object {id:" + std::to_string(message.data[i]) + " })  \n";
-      query += "CREATE (e) -[:I_SEE]-> (p" + std::to_string(i) + ")  \n";
-    }
+    mg::Map query_params(2);
+
+    query_params.Insert("timestamp", mg::Value(std::to_string(t.nanoseconds())));
+
+    std::vector<mg::Value> vec_values(message.data.begin(), message.data.end());
+    // std::vector<std::string> vec_str = {"a", "w"};
+    // std::vector<mg::Value> vec_str_values(vec_str.begin(), vec_str.end());
+    mg::List object_ids(
+        vec_values);
+    query_params.Insert("object_ids", mg::Value(std::move(object_ids)));
+
+    std::string query = "\nCREATE (e:Event) \n"
+                        "SET e.timestamp = toInteger($timestamp) \n"
+                        "WITH e \n"
+                        "UNWIND $object_ids AS object_id \n"
+                        "MERGE (p:Object {id: object_id}) \n"
+                        "CREATE (e) -[:I_SEE]-> (p)";
+
     RCLCPP_INFO(this->get_logger(), query.c_str());
-    if (!db_client_->Execute(query))
+    if (!db_client_->Execute(query, query_params.AsConstMap()))
     {
       std::cerr << "Failed to execute query.";
     }
@@ -85,7 +110,9 @@ private:
 int main(int argc, char *argv[])
 {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<EventGraphWriter>("localhost", 7687));
+  auto graph_writer = std::make_shared<EventGraphWriter>("localhost", 7687);
+  graph_writer->drop_db();
+  rclcpp::spin(graph_writer);
   rclcpp::shutdown();
   return 0;
 }
