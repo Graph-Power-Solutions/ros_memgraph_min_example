@@ -26,7 +26,7 @@ using namespace std::chrono_literals;
 const std::string TOPIC_NAME = "EVENTS_TOPIC";
 const int MAX_OBJECT_ID = 25;
 const int MAX_OBJECT_COUNT = 4;
-const std::chrono::microseconds TIMER = 300ms;
+const std::chrono::microseconds TIMER = 3000ms;
 
 class EventPublisher : public rclcpp::Node
 {
