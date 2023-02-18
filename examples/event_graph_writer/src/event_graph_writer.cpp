@@ -71,10 +71,10 @@ private:
   void topic_callback(const std_msgs::msg::Int32MultiArray &message) const
   {
     RCLCPP_INFO(this->get_logger(), "Got: '%s'", std::to_string(message.data.size()).c_str());
-    rclcpp::Time t = this->now();
 
     mg::Map query_params(2);
 
+    rclcpp::Time t = this->now();
     query_params.Insert("timestamp", mg::Value(std::to_string(t.nanoseconds())));
 
     std::vector<mg::Value> vec_values(message.data.begin(), message.data.end());
