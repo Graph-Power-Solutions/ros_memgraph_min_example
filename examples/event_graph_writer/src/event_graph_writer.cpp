@@ -89,7 +89,43 @@ private:
                         "WITH e \n"
                         "UNWIND $object_ids AS object_id \n"
                         "MERGE (p:Object {id: object_id}) \n"
-                        "CREATE (e) -[:I_SEE]-> (p)";
+                        "CREATE (e) -[:I_SEE]-> (p) \n"
+                        "WITH DISTINCT e \n"
+                        "OPTIONAL MATCH (prev_e:LAST_EVENT) \n"
+                        "REMOVE prev_e:LAST_EVENT \n"
+                        "SET e:LAST_EVENT \n"
+                        "WITH e, collect(prev_e) AS prev_e_arr \n"
+                        "UNWIND prev_e_arr AS prev_e \n"
+                        "CREATE (prev_e) <-[:PREV_EVENT]- (e) \n";
+
+    /*
+    1. -- Query failed: Using aggregation functions inside of CASE is not allowed.
+
+    CREATE (e:Event)
+    SET e.timestamp = toInteger(1)
+    WITH e
+    OPTIONAL MATCH (prev_e:LAST_EVENT) REMOVE prev_e:LAST_EVENT
+    WITH e, CASE WHEN prev_e IS NOT NULL THEN collect(prev_e) ELSE [] END AS prev_e_arr
+    FOREACH ( prev_e IN prev_e_arr | CREATE (prev_e) <-[:PREV_EVENT]- (e) )
+    SET e:LAST_EVENT
+    WITH e
+    UNWIND [1,2] AS object_id
+    MERGE (p:Object {id: object_id})
+    CREATE (e) -[:I_SEE]-> (p)
+    */
+
+    /*
+    2. -- FOREACH exteranl node is empty
+    CREATE (e:Event)
+    SET e.timestamp = toInteger(1)
+    WITH e
+    OPTIONAL MATCH (prev_e:LAST_EVENT)
+    REMOVE prev_e:LAST_EVENT
+    WITH e, collect(prev_e) AS prev_e_arr // Memgraph [], Neo4j [null]
+    FOREACH ( prev_e IN prev_e_arr | CREATE (prev_e) <-[:PREV_EVENT]- (e) ) // e always is empty ?
+    SET e:LAST_EVENT
+    return e
+    */
 
     RCLCPP_INFO(this->get_logger(), query.c_str());
     if (!db_client_->Execute(query, query_params.AsConstMap()))
