@@ -14,14 +14,14 @@ CREATE (e2:Event {timestamp: 2})
 MERGE (p1:Object {id: 1})
 CREATE (e2) -[:I_SEE]-> (p1)
 MATCH (e1:Event {timestamp: 1})
-CREATE (e1) -[:NEXT_EVENT]-> (e2)
+CREATE (e1) <-[:PREV_EVENT]- (e2)
 ```
 
 It can run short-term memory query:
 ```
 // Seen recently
 MATCH (p:Object {id: 1})
-MATCH (p) <-[:I_SEE]- () <-[:NEXT_EVENT *1..5]- (prev_e) -[:I_SEE]-> (p)
+MATCH (p) <-[:I_SEE]- () -[:PREV_EVENT *1..5]-> (prev_e) -[:I_SEE]-> (p)
 RETURN count(prev_e) AS result
 ```
 
